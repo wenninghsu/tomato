@@ -13,7 +13,7 @@
 
         body {
             font-family: Arial, sans-serif;
-            padding-bottom: 70px;
+            padding-bottom: 120px;
             background-color: #f5f5f5;
         }
 
@@ -132,13 +132,27 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 50px;
             background: linear-gradient(to right, #ff6b6b, #ee5a6f);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            padding: 15px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .control-top {
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
+        }
+
+        .control-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
         }
 
         .reveal-btn {
@@ -164,10 +178,44 @@
 
         .counter {
             position: absolute;
-            right: 30px;
+            right: 0;
             color: white;
             font-weight: bold;
             font-size: 16px;
+        }
+
+        .image-selector {
+            display: flex;
+            gap: 10px;
+        }
+
+        .image-btn {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            border: 2px solid white;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .image-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .image-btn.active {
+            background-color: rgba(255, 255, 255, 0.5);
+            border-color: #fff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
         }
 
         @media (max-width: 768px) {
@@ -185,9 +233,39 @@
     </div>
 
     <div class="control-bar">
-        <button class="reveal-btn" id="revealBtn">顯示番茄 🍅</button>
-        <button class="reveal-btn" id="resetBtn" style="margin-left: 20px;">重置</button>
-        <div class="counter" id="counter">0 / 60</div>
+        <div class="control-top">
+            <button class="reveal-btn" id="revealBtn">顯示番茄 🍅</button>
+            <button class="reveal-btn" id="resetBtn">重置</button>
+            <div class="counter" id="counter">0 / 60</div>
+        </div>
+        <div class="control-bottom">
+            <div class="image-selector">
+                <button class="image-btn" data-image="burrito.png">
+                    <img src="burrito.png" alt="burrito">
+                </button>
+                <button class="image-btn" data-image="dorito.png">
+                    <img src="dorito.png" alt="dorito">
+                </button>
+                <button class="image-btn" data-image="gelato.png">
+                    <img src="gelato.png" alt="gelato">
+                </button>
+                <button class="image-btn" data-image="mosquito.png">
+                    <img src="mosquito.png" alt="mosquito">
+                </button>
+                <button class="image-btn" data-image="potato.png">
+                    <img src="potato.png" alt="potato">
+                </button>
+                <button class="image-btn" data-image="risotto.png">
+                    <img src="risotto.png" alt="risotto">
+                </button>
+                <button class="image-btn active" data-image="tomato.png">
+                    <img src="tomato.png" alt="tomato">
+                </button>
+                <button class="image-btn" data-image="torpedo.png">
+                    <img src="torpedo.png" alt="torpedo">
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -205,6 +283,9 @@
             'mask-right-two-thirds',// 看得到右邊2/3
             'mask-full'             // 整張都看得見
         ];
+
+        // Load current image from localStorage (default to tomato.png)
+        let currentImage = localStorage.getItem('currentImage') || 'tomato.png';
 
         // Load state from localStorage or initialize new state
         let savedMaskOrder = localStorage.getItem('maskOrder');
@@ -246,10 +327,10 @@
                 imageItem.classList.add('visible');
             }
             
-            // Use istockphoto tomato image
+            // Use current selected image
             const img = document.createElement('img');
-            img.src = 'tomato.png';
-            img.alt = `tomato ${i + 1}`;
+            img.src = currentImage;
+            img.alt = `image ${i + 1}`;
             img.className = 'placeholder';
             
             imageItem.appendChild(img);
@@ -261,6 +342,37 @@
         const revealBtn = document.getElementById('revealBtn');
         const resetBtn = document.getElementById('resetBtn');
         const counter = document.getElementById('counter');
+        const imageButtons = document.querySelectorAll('.image-btn');
+
+        // Set active state for current image button
+        imageButtons.forEach(btn => {
+            if (btn.dataset.image === currentImage) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        // Image button click handlers
+        imageButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const newImage = btn.dataset.image;
+                
+                // Update active state
+                imageButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Update all images in the grid
+                const allImages = document.querySelectorAll('.image-item img');
+                allImages.forEach(img => {
+                    img.src = newImage;
+                });
+                
+                // Save to localStorage
+                currentImage = newImage;
+                localStorage.setItem('currentImage', newImage);
+            });
+        });
 
         // Update button state based on current visible count
         if (visibleCount === totalImages) {
@@ -296,9 +408,10 @@
 
         // Reset button click handler
         resetBtn.addEventListener('click', () => {
-            // Clear localStorage
+            // Clear localStorage EXCEPT currentImage
             localStorage.removeItem('maskOrder');
             localStorage.removeItem('visibleState');
+            // Keep currentImage in localStorage
             
             // Reload the page to reset everything
             location.reload();
