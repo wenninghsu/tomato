@@ -49,10 +49,9 @@
         }
 
         .image-item .placeholder {
-            font-size: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
         /* Mask classes - using white overlays */
@@ -216,12 +215,13 @@
             const randomMaskClass = maskClasses[Math.floor(Math.random() * maskClasses.length)];
             imageItem.classList.add(randomMaskClass);
             
-            // Use tomato emoji
-            const placeholder = document.createElement('div');
-            placeholder.className = 'placeholder';
-            placeholder.textContent = '🍅';
+            // Use istockphoto tomato image
+            const img = document.createElement('img');
+            img.src = 'tomato.png';
+            img.alt = `tomato ${i + 1}`;
+            img.className = 'placeholder';
             
-            imageItem.appendChild(placeholder);
+            imageItem.appendChild(img);
             imageGrid.appendChild(imageItem);
         }
 
