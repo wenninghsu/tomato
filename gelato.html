@@ -186,6 +186,7 @@
 
     <div class="control-bar">
         <button class="reveal-btn" id="revealBtn">顯示番茄 🍅</button>
+        <button class="reveal-btn" id="resetBtn" style="margin-left: 20px;">重置</button>
         <div class="counter" id="counter">0 / 60</div>
     </div>
 
@@ -205,15 +206,45 @@
             'mask-full'             // 整張都看得見
         ];
 
+        // Load state from localStorage or initialize new state
+        let savedMaskOrder = localStorage.getItem('maskOrder');
+        let savedVisibleState = localStorage.getItem('visibleState');
+        
+        let maskOrder;
+        let visibleState;
+        
+        if (savedMaskOrder && savedVisibleState) {
+            // Load saved state
+            maskOrder = JSON.parse(savedMaskOrder);
+            visibleState = JSON.parse(savedVisibleState);
+            visibleCount = visibleState.filter(v => v).length;
+        } else {
+            // Generate new random mask order
+            maskOrder = [];
+            for (let i = 0; i < totalImages; i++) {
+                const randomMaskClass = maskClasses[Math.floor(Math.random() * maskClasses.length)];
+                maskOrder.push(randomMaskClass);
+            }
+            visibleState = new Array(totalImages).fill(false);
+            
+            // Save to localStorage
+            localStorage.setItem('maskOrder', JSON.stringify(maskOrder));
+            localStorage.setItem('visibleState', JSON.stringify(visibleState));
+        }
+
         // Generate image elements
         for (let i = 0; i < totalImages; i++) {
             const imageItem = document.createElement('div');
             imageItem.className = 'image-item';
             imageItem.dataset.index = i;
             
-            // Randomly assign one of the 6 mask classes
-            const randomMaskClass = maskClasses[Math.floor(Math.random() * maskClasses.length)];
-            imageItem.classList.add(randomMaskClass);
+            // Apply saved or generated mask class
+            imageItem.classList.add(maskOrder[i]);
+            
+            // Apply visible state if saved
+            if (visibleState[i]) {
+                imageItem.classList.add('visible');
+            }
             
             // Use istockphoto tomato image
             const img = document.createElement('img');
@@ -228,7 +259,15 @@
         // Get all image items
         const imageItems = document.querySelectorAll('.image-item');
         const revealBtn = document.getElementById('revealBtn');
+        const resetBtn = document.getElementById('resetBtn');
         const counter = document.getElementById('counter');
+
+        // Update button state based on current visible count
+        if (visibleCount === totalImages) {
+            revealBtn.textContent = '全部顯示完成！🎉';
+            revealBtn.disabled = true;
+            revealBtn.style.cursor = 'not-allowed';
+        }
 
         // Reveal button click handler
         revealBtn.addEventListener('click', () => {
@@ -236,7 +275,12 @@
             for (let i = 0; i < imageItems.length; i++) {
                 if (!imageItems[i].classList.contains('visible')) {
                     imageItems[i].classList.add('visible');
+                    visibleState[i] = true;
                     visibleCount++;
+                    
+                    // Save to localStorage
+                    localStorage.setItem('visibleState', JSON.stringify(visibleState));
+                    
                     updateCounter();
                     
                     // Check if all images are revealed
@@ -248,6 +292,16 @@
                     break;
                 }
             }
+        });
+
+        // Reset button click handler
+        resetBtn.addEventListener('click', () => {
+            // Clear localStorage
+            localStorage.removeItem('maskOrder');
+            localStorage.removeItem('visibleState');
+            
+            // Reload the page to reset everything
+            location.reload();
         });
 
         // Update counter display
