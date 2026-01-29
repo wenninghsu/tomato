@@ -290,15 +290,20 @@
         // Load state from localStorage or initialize new state
         let savedMaskOrder = localStorage.getItem('maskOrder');
         let savedVisibleState = localStorage.getItem('visibleState');
+        let savedReversePositions = localStorage.getItem('reversePositions');
+        let savedMainImageCount = localStorage.getItem('mainImageCount');
         
         let maskOrder;
         let visibleState;
+        let reversePositions = savedReversePositions ? JSON.parse(savedReversePositions) : [];
+        let mainImageCount;
         
         if (savedMaskOrder && savedVisibleState) {
             // Load saved state
             maskOrder = JSON.parse(savedMaskOrder);
             visibleState = JSON.parse(savedVisibleState);
             visibleCount = visibleState.filter(v => v).length;
+            mainImageCount = savedMainImageCount ? parseInt(savedMainImageCount) : 0;
         } else {
             // Generate new random mask order
             maskOrder = [];
@@ -307,10 +312,12 @@
                 maskOrder.push(randomMaskClass);
             }
             visibleState = new Array(totalImages).fill(false);
+            mainImageCount = 0;
             
             // Save to localStorage
             localStorage.setItem('maskOrder', JSON.stringify(maskOrder));
             localStorage.setItem('visibleState', JSON.stringify(visibleState));
+            localStorage.setItem('mainImageCount', '0');
         }
 
         // Generate image elements
@@ -319,17 +326,25 @@
             imageItem.className = 'image-item';
             imageItem.dataset.index = i;
             
-            // Apply saved or generated mask class
-            imageItem.classList.add(maskOrder[i]);
+            // Check if this position should be a reverse image
+            const isReverse = reversePositions.includes(i);
+            
+            if (isReverse) {
+                // Don't apply mask class for reverse images
+                imageItem.classList.add('mask-full');
+            } else {
+                // Apply saved or generated mask class for normal images
+                imageItem.classList.add(maskOrder[i]);
+            }
             
             // Apply visible state if saved
             if (visibleState[i]) {
                 imageItem.classList.add('visible');
             }
             
-            // Use current selected image
+            // Use current selected image or reverse image
             const img = document.createElement('img');
-            img.src = currentImage;
+            img.src = isReverse ? 'reverse.png' : currentImage;
             img.alt = `image ${i + 1}`;
             img.className = 'placeholder';
             
@@ -362,10 +377,12 @@
                 imageButtons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 
-                // Update all images in the grid
-                const allImages = document.querySelectorAll('.image-item img');
-                allImages.forEach(img => {
-                    img.src = newImage;
+                // Update all non-reverse images in the grid
+                imageItems.forEach((item, index) => {
+                    const img = item.querySelector('img');
+                    if (!reversePositions.includes(index)) {
+                        img.src = newImage;
+                    }
                 });
                 
                 // Save to localStorage
@@ -386,6 +403,36 @@
             // Find the first hidden image
             for (let i = 0; i < imageItems.length; i++) {
                 if (!imageItems[i].classList.contains('visible')) {
+                    // Check if we should trigger a reverse image
+                    let shouldShowReverse = false;
+                    
+                    if (mainImageCount >= 4) {
+                        // Random chance to show reverse (20% chance)
+                        shouldShowReverse = Math.random() < 0.2;
+                    }
+                    
+                    if (shouldShowReverse) {
+                        // Show reverse.png
+                        const img = imageItems[i].querySelector('img');
+                        img.src = 'reverse.png';
+                        
+                        // Remove existing mask class and add mask-full
+                        imageItems[i].classList.remove(...maskClasses);
+                        imageItems[i].classList.add('mask-full');
+                        
+                        // Mark this position as reverse
+                        reversePositions.push(i);
+                        localStorage.setItem('reversePositions', JSON.stringify(reversePositions));
+                        
+                        // Reset main image counter
+                        mainImageCount = 0;
+                        localStorage.setItem('mainImageCount', mainImageCount.toString());
+                    } else {
+                        // Show normal image and increment counter
+                        mainImageCount++;
+                        localStorage.setItem('mainImageCount', mainImageCount.toString());
+                    }
+                    
                     imageItems[i].classList.add('visible');
                     visibleState[i] = true;
                     visibleCount++;
@@ -411,6 +458,8 @@
             // Clear localStorage EXCEPT currentImage
             localStorage.removeItem('maskOrder');
             localStorage.removeItem('visibleState');
+            localStorage.removeItem('reversePositions');
+            localStorage.removeItem('mainImageCount');
             // Keep currentImage in localStorage
             
             // Reload the page to reset everything
