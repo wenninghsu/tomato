@@ -1,0 +1,527 @@
+:root {
+    --images-per-row: 6;
+    --images-per-row-mobile: 3;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    padding-bottom: 100px;
+    background-color: #f5f5f5;
+}
+
+.main-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.image-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.image-item {
+    width: calc((100% - (10px * (var(--images-per-row) - 1))) / var(--images-per-row));
+    aspect-ratio: 1;
+    background-color: #ffffff;
+    border: 1px solid #DFDFDD;
+    border-radius: 8px;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.image-item.visible {
+    opacity: 1;
+}
+
+.image-item .placeholder {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Mask classes - using white overlays */
+/* 遮住右邊2/3，只看得到左邊1/3 */
+.mask-left-third::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 33.33%;
+    right: 0;
+    bottom: 0;
+    background-color: #ffffff;
+}
+
+/* 遮住左右兩側，只看得到中間1/3 */
+.mask-middle-third::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 33.33%;
+    bottom: 0;
+    background-color: #ffffff;
+    z-index: 1;
+}
+
+.mask-middle-third::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 33.33%;
+    bottom: 0;
+    background-color: #ffffff;
+    z-index: 1;
+}
+
+/* 遮住左邊2/3，只看得到右邊1/3 */
+.mask-right-third::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 33.33%;
+    bottom: 0;
+    background-color: #ffffff;
+}
+
+/* 遮住右邊1/3，看得到左邊2/3 */
+.mask-left-two-thirds::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 33.33%;
+    bottom: 0;
+    background-color: #ffffff;
+}
+
+/* 遮住左邊1/3，看得到右邊2/3 */
+.mask-right-two-thirds::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 33.33%;
+    bottom: 0;
+    background-color: #ffffff;
+}
+
+/* 整張都看得見，不需要遮罩 */
+.mask-full::after {
+    content: none;
+}
+
+/* === 新增的 9 種 mask === */
+/* 1. 只遮住右邊3/4，只看左邊1/4 */
+.mask-9-1::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 75%;
+    bottom: 0;
+    background-color: #ffffff;
+}
+
+/* 2. 遮住左邊1/4和右邊1/2，看中間1/4 (25%-50%) */
+.mask-9-2::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 25%;
+    bottom: 0;
+    background-color: #ffffff;
+    z-index: 1;
+}
+
+.mask-9-2::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    bottom: 0;
+    background-color: #ffffff;
+    z-index: 1;
+}
+
+/* 3. 遮住左邊1/2和右邊1/4，看中間1/4 (50%-75%) */
+.mask-9-3::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    bottom: 0;
+    background-color: #ffffff;
+    z-index: 1;
+}
+
+.mask-9-3::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 25%;
+    bottom: 0;
+    background-color: #ffffff;
+    z-index: 1;
+}
+
+/* 4. 只遮住左邊3/4，只看右邊1/4 */
+.mask-9-4::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 75%;
+    bottom: 0;
+    background-color: #ffffff;
+}
+
+/* 5. 遮住左半1/2，看右半 */
+.mask-9-5::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50%;
+    bottom: 0;
+    background-color: #ffffff;
+}
+
+/* 6. 遮住右半1/2，看左半 */
+.mask-9-6::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 50%;
+    bottom: 0;
+    background-color: #ffffff;
+}
+
+/* 7. 只遮住左右兩邊的1/4，看中間1/2 */
+.mask-9-7::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 25%;
+    bottom: 0;
+    background-color: #ffffff;
+    z-index: 1;
+}
+
+.mask-9-7::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 25%;
+    bottom: 0;
+    background-color: #ffffff;
+    z-index: 1;
+}
+
+/* 8. 遮住左邊1/4，看右邊3/4 */
+.mask-9-8::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 25%;
+    bottom: 0;
+    background-color: #ffffff;
+}
+
+/* 9. 遮住右邊1/4，看左邊3/4 */
+.mask-9-9::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 25%;
+    bottom: 0;
+    background-color: #ffffff;
+}
+
+.control-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    padding: 10px 15px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.reveal-btn {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333333;
+    background-color: #ffffff;
+    border: 1px solid #ADADAD;
+    border-radius: 100%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 70px;
+    width: 70px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    display: none;
+}
+
+.reveal-btn-m {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333333;
+    background-color: #ffffff;
+    border: 1px solid #ADADAD;
+    border-radius: 100%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: 70px;
+    width: 70px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+
+.reveal-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.reveal-btn:active {
+    transform: scale(0.95);
+}
+
+.reveal-btn-m:hover {
+    background-color: #f5f5f5;
+}
+
+.reveal-btn-m:active {
+    transform: scale(0.95);
+}
+
+
+#revealBtn {
+    background-color: #FFCC44;
+    color: #ad0000;
+    border: none;
+}
+
+#revealBtn:hover {
+    background-color: #f5c433;
+}
+
+#revealBtnM {
+    background-color: #FFCC44;
+    color: #ad0000;
+    border: none;
+}
+
+#revealBtnM:hover {
+    background-color: #f5c433;
+}
+
+.image-selector-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 15px;
+}
+
+.image-selector-left,
+.image-selector-right {
+    display: flex;
+    gap: 8px;
+}
+
+.control-right {
+    position: absolute;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.reset-btn {
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: normal;
+    color: #999999;
+    background-color: transparent;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.5;
+}
+
+.reset-btn:hover {
+    opacity: 1;
+    color: #C6613F;
+    background-color: rgba(198, 97, 63, 0.1);
+}
+
+.reset-btn:active {
+    transform: scale(0.95);
+}
+
+.counter {
+    color: #333333;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.image-btn {
+    width: 35px;
+    height: 35px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    opacity: 0.25;
+    flex-shrink: 0;  /* 不收缩 */
+}
+
+.image-btn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-btn:hover {
+    background-color: #f5f5f5;
+    opacity: 0.7;
+}
+
+.image-btn.active {
+    opacity: 1;
+    box-shadow: 0 0 0 2px #000000;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding-bottom: 120px;
+    }
+    
+    .image-item {
+        width: calc((100% - (10px * (var(--images-per-row-mobile) - 1))) / var(--images-per-row-mobile));
+    }
+    
+    /* 三列布局：GO按钮 | 图片按钮 | counter/reset */
+    .control-bar {
+        padding: 10px;
+        gap: 10px;
+        justify-content: flex-start;
+        flex-wrap: nowrap;  /* 外层不换行，三列固定 */
+    }
+    
+    .reveal-btn {
+        display: flex;
+        font-size: 16px;
+        height: 60px;
+        width: 60px;
+        order: 1;
+        flex-shrink: 0;  /* 不收缩 */
+    }
+    
+
+    .reveal-btn-m {
+        display: none;
+    }
+
+    .image-selector-container {
+        flex: 1;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px;
+        order: 2;
+        min-width: 0;
+    }
+    
+    .image-selector-left,
+    .image-selector-right {
+        display: contents;
+    }
+    
+    .control-right {
+        position: relative;
+        right: auto;
+        order: 3;
+        flex-shrink: 0;  /* 不收缩 */
+    }
+    
+    .image-btn {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .counter {
+        font-size: 14px;
+    }
+    
+    .reset-btn {
+        font-size: 11px;
+        padding: 3px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding-bottom: 140px;
+    }
+    
+    .reveal-btn-m {
+        display: none;
+    }
+
+    .reveal-btn {
+        display: flex;
+        font-size: 14px;
+        height: 55px;
+        width: 55px;
+    }
+    
+    .image-btn {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .image-selector-container {
+        gap: 5px;
+    }
+}

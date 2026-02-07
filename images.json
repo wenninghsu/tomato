@@ -1,0 +1,37 @@
+{
+  "extension": "webp",
+  "imagesPerRow": 6,
+  "imagesPerRowMobile": 3,
+  "specialImages": {
+    "reverse": {
+      "image": "reverse",
+      "probability": 0.2,
+      "minCount": 4
+    },
+    "special2": {
+      "image": "皮卡丘",
+      "probability": 0.05,
+      "minCount": 2
+    }
+  },
+  "images": {
+    "3syllables": [
+      "burrito",
+      "dorito",
+      "gelato",
+      "mojito",
+      "mosquito",
+      "pinocchio",
+      "potato",
+      "risotto",
+      "tomato",
+      "torpedo",
+      "鳳梨酥",
+      "紅綠燈"
+    ],
+    "4syllables": [
+      "avocado",
+      "dicaprio"
+    ]
+  }
+}
