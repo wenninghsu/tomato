@@ -36,9 +36,13 @@ let visibleCount = 0;
 const revealBtn = document.getElementById('revealBtn');
 const revealBtnM = document.getElementById('revealBtnM');
 const resetBtn = document.getElementById('resetBtn');
+const hintBtn = document.getElementById('hintBtn');
 const counter = document.getElementById('counter');
 const imageSelectorLeft = document.getElementById('imageSelectorLeft');
 const imageSelectorRight = document.getElementById('imageSelectorRight');
+const hintOverlay = document.getElementById('hintOverlay');
+const hintClose = document.getElementById('hintClose');
+const hintImages = document.getElementById('hintImages');
 
 // Fetch images list from images.json
 fetch('images.json')
@@ -375,5 +379,50 @@ function initializeGame() {
         
         // Reload the page to reset everything
         location.reload();
+    });
+
+    // Generate hint images
+    IMAGES.forEach((imageName) => {
+        const hintItem = document.createElement('div');
+        hintItem.className = 'hint-image-item';
+        
+        const img = document.createElement('img');
+        img.src = `${imageName}.${IMAGE_EXTENSION}`;
+        img.alt = imageName;
+        
+        hintItem.appendChild(img);
+        hintImages.appendChild(hintItem);
+    });
+
+    // Hint button toggle
+    hintBtn.addEventListener('click', () => {
+        hintOverlay.classList.toggle('active');
+    });
+
+    // Close hint overlay
+    hintClose.addEventListener('click', () => {
+        hintOverlay.classList.remove('active');
+    });
+
+    // Close hint overlay when clicking outside
+    hintOverlay.addEventListener('click', (e) => {
+        if (e.target === hintOverlay) {
+            hintOverlay.classList.remove('active');
+        }
+    });
+
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+        // ENTER or SPACE key triggers GO button
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            revealBtn.click();
+        }
+        
+        // ESC key triggers reset button
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            resetBtn.click();
+        }
     });
 }
